@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.lab/
+.DS_Store
+.env
+*.tfstate*
+*.tfplan
+*.pem
+*.log
+.coverage
+coverage.xml
+htmlcov/
+.mypy_cache/

@@ -1,0 +1,38 @@
+name: CI - PROVE (validation only)
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  prove:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Run unit and contract tests
+        run: |
+          ./scripts/test.sh
+          python3 -m unittest discover -s tests -v
+      - name: Validate shell script syntax
+        run: for file in scripts/*.sh; do bash -n "$file"; done
+      - name: Build a validation image (not the release artefact)
+        run: |
+          docker build -f app/Dockerfile --build-arg SOURCE_REVISION="${GITHUB_SHA}" \
+            -t shop-ci-check:${GITHUB_SHA} app
+      - name: Smoke test validation image
+        run: |
+          docker run -d --name shop-ci-check --publish 127.0.0.1:8080:8000 \
+            --env ENVIRONMENT=ci shop-ci-check:${GITHUB_SHA}
+          python3 scripts/verify_http.py http://127.0.0.1:8080 "${GITHUB_SHA}" ci
+      - name: Clean up runner
+        if: always()
+        run: docker rm -f shop-ci-check 2>/dev/null || true

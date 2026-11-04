@@ -1,0 +1,154 @@
+name: Release lab - build once, promote by registry digest
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-lab-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  prove:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: PROVE - unit tests and evidence tooling
+        run: |
+          ./scripts/test.sh
+          python3 -m unittest discover -s tests -v
+          for file in scripts/*.sh; do bash -n "$file"; done
+
+  package:
+    needs: prove
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image_ref: ${{ steps.reference.outputs.ref }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Derive lowercase GHCR image name
+        id: name
+        shell: bash
+        run: echo "image_name=ghcr.io/${GITHUB_REPOSITORY,,}/shop-api" >> "$GITHUB_OUTPUT"
+      - name: Authenticate to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Enable Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: PACKAGE - build and publish once
+        id: push
+        uses: docker/build-push-action@v7
+        with:
+          context: ./app
+          file: ./app/Dockerfile
+          push: true
+          tags: ${{ steps.name.outputs.image_name }}:${{ github.sha }}
+          build-args: |
+            SOURCE_REVISION=${{ github.sha }}
+            SOURCE_URL=${{ github.server_url }}/${{ github.repository }}
+      - name: Capture authoritative registry digest
+        id: reference
+        shell: bash
+        env:
+          IMAGE_NAME: ${{ steps.name.outputs.image_name }}
+          REGISTRY_DIGEST: ${{ steps.push.outputs.digest }}
+        run: |
+          [[ "$REGISTRY_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]] || exit 1
+          echo "ref=${IMAGE_NAME}@${REGISTRY_DIGEST}" >> "$GITHUB_OUTPUT"
+      - name: Start Release Evidence Record
+        env:
+          IMAGE_REF: ${{ steps.reference.outputs.ref }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python3 scripts/record_evidence.py start --output release-evidence.md \
+            --source "$GITHUB_SHA" --image-ref "$IMAGE_REF" --run-url "$RUN_URL"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-record-package
+          path: release-evidence.md
+          if-no-files-found: error
+
+  staging:
+    needs: package
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-record-package
+      - name: Authenticate to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: PROMOTE same digest to staging lab runner
+        env:
+          IMAGE_REF: ${{ needs.package.outputs.image_ref }}
+        run: |
+          docker pull "$IMAGE_REF"
+          docker run -d --name shop-staging --publish 127.0.0.1:8081:8000 \
+            --env ENVIRONMENT=staging "$IMAGE_REF"
+          python3 scripts/verify_http.py http://127.0.0.1:8081 "$GITHUB_SHA" staging
+          python3 scripts/record_evidence.py phase --output release-evidence.md \
+            --phase staging --status PASS --image-ref "$IMAGE_REF"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-record-staging
+          path: release-evidence.md
+          if-no-files-found: error
+      - name: Clean up staging lab runner
+        if: always()
+        run: docker rm -f shop-staging 2>/dev/null || true
+
+  production:
+    needs: [package, staging]
+    runs-on: ubuntu-24.04
+    environment: lab-production
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-record-staging
+      - name: Authenticate to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: PROMOTE same digest to production lab runner
+        env:
+          IMAGE_REF: ${{ needs.package.outputs.image_ref }}
+        run: |
+          docker pull "$IMAGE_REF"
+          docker run -d --name shop-production --publish 127.0.0.1:8082:8000 \
+            --env ENVIRONMENT=production "$IMAGE_REF"
+          python3 scripts/verify_http.py http://127.0.0.1:8082 "$GITHUB_SHA" production
+          python3 scripts/record_evidence.py phase --output release-evidence.md \
+            --phase production --status PASS --image-ref "$IMAGE_REF"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-record-final
+          path: release-evidence.md
+          if-no-files-found: error
+      - name: Clean up production lab runner
+        if: always()
+        run: docker rm -f shop-production 2>/dev/null || true
