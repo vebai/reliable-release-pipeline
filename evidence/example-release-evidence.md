@@ -1,6 +1,6 @@
 # Chapter 8 — fictional release evidence example
 
-> **Illustrative case study only.** All SHA and digest values below are abbreviated for illustration. They are **not real artefact identities, test results, AWS resources, or evidence of deployment**. Use the blank template for real releases.
+> **Illustrative case study only.** All SHA and digest values below are abbreviated exactly as in the manuscript. They are **not real artefact identities, test results, AWS resources, or evidence of deployment**. Use the blank template for real releases.
 
 | Evidence field | Case-study observation |
 | --- | --- |

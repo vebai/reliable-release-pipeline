@@ -1,6 +1,6 @@
 # Mapping this small lab to the book's AWS running example
 
-**Status: mapping only — AWS resources and deployments have not been created, tested or validated by this repository.** The book’s Shop API uses AWS, Amazon ECR and federated identity as its running example. The GitHub Actions demonstration uses GHCR because the immediate lab is deliberately small and has no AWS preconditions.
+**Status: mapping only — AWS resources and deployments have not been created, tested or validated by this repository.** The manuscript's Shop API uses AWS, Amazon ECR and federated identity as its running example. The GitHub Actions demonstration uses GHCR because the immediate lab is deliberately small and has no AWS preconditions.
 
 | Book concept | In this repo | What an AWS implementation would additionally require |
 | --- | --- | --- |

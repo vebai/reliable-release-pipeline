@@ -26,7 +26,7 @@ flowchart TD
 
 ## What is outside the implementation
 
-The book's conceptual running deployment uses AWS, ECR, federated identity, configuration checks, infrastructure governance, a 5% canary and monitoring signals. This reference implementation avoids AWS provisioning, real traffic splitting, ALB / ECS / EKS, GitLab CI, database migrations, live traffic, vulnerability gating, OIDC trust policy setup, full logging/metrics, and SBOM/signature generation. See [AWS mapping](aws-mapping.md) if you later want to expand the lab.
+The book's conceptual running deployment uses AWS, ECR, federated identity, configuration checks, infrastructure governance, a 5% canary and monitoring signals. These are **teaching concepts and manuscript examples**, not silently asserted features of this repo. This reference implementation intentionally avoids AWS provisioning, real traffic splitting, ALB / ECS / EKS, GitLab CI, database migrations, live traffic, vulnerability gating, OIDC trust policy setup, full logging/metrics, and SBOM/signature generation. See [AWS mapping](aws-mapping.md) if you later want to expand the lab.
 
 ## Security guardrails
 
