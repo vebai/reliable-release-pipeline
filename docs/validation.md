@@ -31,7 +31,7 @@ This repository has three deliberately separate evidence levels:
 
 | Validation | Observed status | Supporting evidence / next action |
 | --- | --- | --- |
-| Offline compilation and tests | **PASS** | Nine Python unit tests; shell syntax; optional YAML parsing in authoring environment and reader's Mac |
+| Offline compilation and tests | **PASS** | Nine Python unit tests; shell syntax; optional YAML parsing |
 | Mac preflight | **PASS** | Python 3.11.4, Docker server 20.10.11 |
 | First Docker image built | **PASS** | `good-v1`, local image ID `sha256:62c072e10504b4caac10d97e8ce99226dca4f7c797f3753009fac8dd856753b1` |
 | First staging promotion and verification | **PASS** | `/health` 200, `/version good-v1`, `/products` 200; verified same local ID |

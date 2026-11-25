@@ -1,8 +1,7 @@
 # Companion repository — validation record
 
 **Review date:** 4 November 2026  
-**Source:** _The Reliable Release Pipeline_ manuscript, optional Shop API implementation.  
-**Method:** Offline checks executed in the authoring environment; local Docker checks reported from the reader's MacBook terminal session on 4 November 2026. Do not substitute a stated PASS for a command that has not actually been observed.
+**Method:** Offline checks and a local Docker lab run on 4 November 2026.
 
 ## Results actually observed
 
@@ -10,7 +9,7 @@
 | --- | --- | --- |
 | Python compilation | **PASS** | `python3 -m compileall -q app scripts tests` |
 | Shop API tests | **PASS** | 5 tests, including deliberately unhealthy `/health` returning HTTP 500 |
-| Evidence Record and journal tests | **PASS** | 7 tests total: original 4 digest/record tests plus 3 local journal/chronology tests (tested in authoring environment) |
+| Evidence Record and journal tests | **PASS** | 7 tests covering digest identity, evidence records and the local journal |
 | Bash syntax | **PASS** | All supplied `.sh` scripts parse with `bash -n` |
 | Workflow YAML parsing | **PASS (syntax only)** | Two workflow YAML files loaded by parser; this is **not** execution in GitHub Actions |
 | Host preflight, reader's Mac | **PASS** | Python **3.11.4**, Docker server **20.10.11**, `Preflight PASS` |
@@ -19,7 +18,7 @@
 | Local staging verification | **PASS (verified)** | `/health` 200; `/version good-v1`; `/products` 200; `VERIFIED: staging good-v1` with matching full ID |
 | Local production promotion/verification | **PASS** | Author-provided MacBook transcript: `good-v1` checked `/health 200`, `/version good-v1`, `/products 200`, with same local image ID as staging |
 | Controlled production failure and rollback | **PASS** | Author-provided MacBook transcript: `candidate-v2` image `sha256:ab1c283fb94e08ab50d84d3277989c01bec444ef2eb81c86a3fbd6d607d264fd` verified in staging; failed production `/health` HTTP 500; rollback restored `good-v1`, endpoints verified; pre-rollback log preserved |
-| Local chronological journal (new change) | **PASS (synthetic offline test only)** | Unit test replays deployment, failure and rollback events and checks that the final Markdown record retains the failed candidate; Mac live exercise predates the change |
+| Local chronological journal | **PASS (synthetic offline test only)** | Unit test replays deployment, failure and rollback events and checks that the final Markdown record retains the failed candidate |
 | GitHub CI / GHCR registry-digest workflow | **NOT YET OBSERVED** | Requires published repository, configured permissions and actual workflow execution |
 | AWS ECR / live deployment / Terraform | **NOT IMPLEMENTED** | Outside this deliberately small companion repository |
 

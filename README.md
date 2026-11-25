@@ -8,7 +8,7 @@
 
 The main outcome is a **Release Evidence Record**: a written explanation of what changed, what was tested, what was built, what was deployed, what happened after deployment, and how recovery was handled. The tiny Shop API exists only to give those decisions a real application to work with.
 
-The lab now writes a **chronological local event journal** to `.lab/evidence/events.jsonl`. This records verified passes, failed HTTP verification and recovered releases as separate events. The generated Markdown worksheet shows both the **current state** and the **event history**; it does not claim that older exercises performed before journalling was added were automatically recorded.
+![Six stages from change to recovery. Git commits, tests and coverage, image digests, promotion approvals, health checks, and recovery targets feed the Release Evidence Record.](docs/images/reliable-release-overview.png)
 
 ## Get the book on Amazon
 
@@ -24,7 +24,7 @@ You **do not** need programming, cloud or CI/CD experience to read the documenta
 | --- | --- | --- | --- |
 | **Read and inspect** | Read the worked release evidence and architecture; do not run code | None beyond a browser or text editor | [Chapter reading map](docs/reading-map.md) and [completed example](evidence/example-release-evidence.md) |
 | **Run a local lab (recommended)** | Test, build, deploy to two local environments, detect failure and recover | Python, Git, Docker; **no GitHub or AWS account** | [First-time setup](docs/first-steps.md), then [local lab](docs/local-lab.md) |
-| **Run GitHub Actions** | See CI, one registry image build, promotion of the same digest into two temporary lab runners | A GitHub account and permissions to run Actions and use GitHub Container Registry | [Publish to GitHub](docs/publish-to-github.md), then [GitHub Actions guide](docs/github-actions.md) |
+| **Run GitHub Actions** | See CI, one registry image build, promotion of the same digest into two temporary lab runners | A GitHub account and permissions to run Actions and use GitHub Container Registry | [GitHub Actions guide](docs/github-actions.md) |
 
 **Already ran the offline tests or staging?** You do not need to start over. Open the [local lab guide](docs/local-lab.md) and continue from the last successfully verified step. Do not delete your `.lab/` directory or rebuild unnecessarily: it contains evidence of your earlier work.
 
@@ -76,7 +76,7 @@ A **Docker image** is the packaged application. A **container** is a running ins
 
 The local lab returns a complete `LOCAL_IMAGE_ID=sha256:...`. That proves both local containers ran the same image, but **it is not the registry manifest digest** required by the book's cross-environment release model. The manual GitHub Actions lab builds and pushes an image *once* to GitHub Container Registry (GHCR), records the **registry manifest digest** and uses it in both temporary lab environments.
 
-The manuscript uses **AWS and Amazon ECR** as its running example. This small repository **does not create AWS services, ECR repositories, Terraform infrastructure or a persistent production deployment**. It also does not implement the book's 5% canary, full security gates, signing, live monitoring or real database migrations. See [Architecture](docs/architecture.md) and [AWS concept mapping](docs/aws-mapping.md). These omissions are explicit so that no one mistakes a teaching lab for production infrastructure.
+The published book uses **AWS and Amazon ECR** as its running example. This small repository **does not create AWS services, ECR repositories, Terraform infrastructure or a persistent production deployment**. It also does not implement the book's 5% canary, full security gates, signing, live monitoring or real database migrations. See [Architecture](docs/architecture.md) and [AWS concept mapping](docs/aws-mapping.md). These omissions are explicit so that no one mistakes a teaching lab for production infrastructure.
 
 ## Repository guide
 
@@ -91,7 +91,6 @@ The manuscript uses **AWS and Amazon ECR** as its running example. This small re
 | [`evidence/`](evidence/) | Blank Release Evidence Record, book-aligned fictional example and guidance |
 | [`docs/reading-map.md`](docs/reading-map.md) | How each part corresponds to Chapters 1–8 |
 | [`docs/github-actions.md`](docs/github-actions.md) | Optional GitHub release workflow, setup and limitations |
-| [`docs/publish-to-github.md`](docs/publish-to-github.md) | How to publish a checked repository without publishing local lab evidence |
 | [`docs/validation.md`](docs/validation.md) | What has actually been checked and what remains untested |
 
 ## Safety, cost and housekeeping
@@ -99,7 +98,7 @@ The manuscript uses **AWS and Amazon ECR** as its running example. This small re
 - The local exercise runs only on **your computer**, listening at `127.0.0.1:8081` (staging) and `127.0.0.1:8082` (production **lab**). Here, “production” is only the name of a second local container. No real users, production service or AWS account are involved.
 - Docker may download a Python base image over the internet. The local lab does not provision chargeable cloud infrastructure. GitHub Actions and GHCR can have usage limits or charges; review your account before running cloud-hosted workflows.
 - `--approve` is a *learning acknowledgement*, not actual access control. `--compatible` is your explicit judgement that rollback is safe for this **stateless example**; it does not prove compatibility for a real database or service.
-- **Keep all `scripts/` files and `app/test_shop_api.py` and `tests/` in the published repository.** Readers need them to reproduce the book's evidence. Only generated files, local logs, temporary state and secrets should be excluded. The `.gitignore` already excludes `.lab/` and Python caches.
+- Keep generated logs and evidence in `.lab/`, which Git ignores. Keep credentials out of the repository.
 - The local and GitHub workflows are demonstrations, **not** production security templates. Never weaken a failed gate merely to make a run green.
 
 **Suggested first click:** [First-time setup](docs/first-steps.md). **Already set up?** Go straight to the [local lab](docs/local-lab.md).
