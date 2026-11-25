@@ -1,7 +1,6 @@
 # Companion repository — validation record
 
 **Review date:** 4 November 2026  
-**Source:** _The Reliable Release Pipeline_ manuscript, optional Shop API implementation.  
 **Method:** Offline checks executed in the authoring environment; local Docker checks reported from the reader's MacBook terminal session on 4 November 2026. Do not substitute a stated PASS for a command that has not actually been observed.
 
 ## Results actually observed
