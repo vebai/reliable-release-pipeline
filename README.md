@@ -102,3 +102,7 @@ The published book uses **AWS and Amazon ECR** as its running example. This smal
 - The local and GitHub workflows are demonstrations, **not** production security templates. Never weaken a failed gate merely to make a run green.
 
 **Suggested first click:** [First-time setup](docs/first-steps.md). **Already set up?** Go straight to the [local lab](docs/local-lab.md).
+
+## Continue learning
+
+Continue with [*AWS Cloud Engineering in 10 Days* on Amazon UK (Kindle)](https://www.amazon.co.uk/dp/B0HR7DPTP8) for hands-on practice with deploying, monitoring and troubleshooting an AWS application.
