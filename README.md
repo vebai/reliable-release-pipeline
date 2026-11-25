@@ -10,6 +10,12 @@ The main outcome is a **Release Evidence Record**: a written explanation of what
 
 The lab now writes a **chronological local event journal** to `.lab/evidence/events.jsonl`. This records verified passes, failed HTTP verification and recovered releases as separate events. The generated Markdown worksheet shows both the **current state** and the **event history**; it does not claim that older exercises performed before journalling was added were automatically recorded.
 
+## Get the book on Amazon
+
+**Paperback:** [Amazon UK](https://www.amazon.co.uk/dp/B0HQFSPVS5) · [Amazon US](https://www.amazon.com/dp/B0HQFSPVS5) · [Amazon India](https://www.amazon.in/dp/B0HQFSPVS5)
+
+**Kindle eBook:** [Amazon UK](https://www.amazon.co.uk/dp/B0H7PZNFZP) · [Amazon US](https://www.amazon.com/dp/B0H7PZNFZP) · [Amazon India](https://www.amazon.in/dp/B0H7PZNFZP)
+
 ## Start here — choose one route
 
 You **do not** need programming, cloud or CI/CD experience to read the documentation. The three routes are independent; choose the one that suits your starting point.
